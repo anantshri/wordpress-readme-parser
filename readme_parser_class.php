@@ -22,21 +22,98 @@ class wp_readme_parser {
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	//  Lets Define Some Variables her for the class                                            //
 	//////////////////////////////////////////////////////////////////////////////////////////////
-	$data;
-	$contrib;
-	$stable;
-	$require;
-	$faq;
-	$installation;
-	$other;
-	$changelog;
-	$short_desc;
-	$desc;
-	$screenshots;
-	$upgrade_notice;
-	$url;
-	// Function to get the readme url
-	function get_url($url)
+	var $data;
+	var $contrib;
+	var $stable;
+	var $require;
+	var $faq;
+	var $installation;
+	var $other;
+	var $changelog;
+	var $short_desc;
+	var $desc;
+	var $screenshots;
+	var $upgrade_notice;
+	var $url;
+	var $plug_name;
+	var $tags;
+// Getter and setters for all the variables.	
+	function getTags() { return $this->tags; } 
+	function getData() { return $this->data; } 
+	function getContrib() { return $this->contrib; } 
+	function getStable() { return $this->stable; } 
+	function getRequire() { return $this->require; } 
+	function getFaq() { return $this->faq; } 
+	function getInstallation() { return $this->installation; } 
+	function getOther() { return $this->other; } 
+	function getChangelog() { return $this->changelog; } 
+	function getShort_desc() { return $this->short_desc; } 
+	function getDesc() { return $this->desc; } 
+	function getScreenshots() { return $this->screenshots; } 
+	function getUpgrade_notice() { return $this->upgrade_notice; } 
+	function getUrl() { return $this->url; } 
+	function getPlug_name() { return $this->plug_name;}
+	function setData($x) { $this->data = $x; } 
+	function setContrib($x) { $this->contrib = $x; } 
+	function setStable($x) { $this->stable = $x; } 
+	function setRequire($x) { $this->require = $x; } 
+	function setFaq($x) { $this->faq = $x; } 
+	function setTags($x) { $this->tags = $x; } 
+	function setInstallation($x) { $this->installation = $x; } 
+	function setOther($x) { $this->other = $x; } 
+	function setChangelog($x) { $this->changelog = $x; } 
+	function setShort_desc($x) { $this->short_desc = $x; } 
+	function setDesc($x) { $this->desc = $x; } 
+	function setScreenshots($x) { $this->screenshots = $x; } 
+	function setUpgrade_notice($x) { $this->upgrade_notice = $x; } 
+	function setUrl($x) { $this->url = $x; } 
+	function setPlug_name($x) { $this->plug_name = $x;}
+	
+	// Costructor setting the plugin name
+	function __construct($plug)
+	{
+		$this->setPlug_name($plug);
+		$this->find_stable();
+		$this->set_values();
+		//$this->fetch_data();
+	}
+	function set_values()
+	{
+		$this->fetch_data();
+//		echo "Data Fetch" . $this->getData();
+		$data_ar = explode("\n",$this->getData());
+		foreach ($data_ar as $line)
+		{
+			if (stristr($line,"Contributors:"))
+			{
+				$this->setContrib(substr($line,strpos($line,"Contributers:")+13));
+			}
+			if (stristr($line,"Tags:"))
+			{
+				$this->setTags(substr($line,strpos($line,"Tags:")+13));			
+			}
+		}
+	}
+	function find_stable()
+	{
+		$url_temp = 'http://svn.wp-plugins.org/' . $this->plug_name . '/trunk/readme.txt';;
+		$data_temp = file_get_contents($url_temp,0,null,0,300);
+		if (stristr($data_temp,'Stable tag:'))
+		{
+			$this->stable = trim(substr($data_temp,strpos($data_temp,'Stable tag:')+11,8));
+		}
+		if ($this->getStable() == "")
+		{
+			$this->setUrl($url_temp);
+		}
+		else
+		{
+			$url_temp='http://svn.wp-plugins.org/' . $this->getPlug_name() . '/tags/' . $this->getStable() . '/readme.txt';
+			$this->setUrl($url_temp);
+		}
+	}
+	// Function to get the data
+	function fetch_data()
 	{
 // start with the best method <- if curl found then use it.
 		if (function_exists('curl_init'))
@@ -52,7 +129,7 @@ class wp_readme_parser {
 		else
 		{
 		//	echo "curl not found";
-			$data = file_get_contents($url);
+			$data = file_get_contents($this->url);
 			if ($data == false)
 			{
 				echo "error occured";
@@ -64,7 +141,7 @@ class wp_readme_parser {
 		//		echo "</pre>";
 			}
 		}
-		return $data;
+		$this->setData($data);
 	}
 }
 ?>
