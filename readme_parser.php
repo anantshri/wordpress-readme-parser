@@ -167,4 +167,5 @@ else
 {
 	echo "Please pass variable";
 }
+echo "\n<br />Mem" . memory_get_usage();
 ?>
