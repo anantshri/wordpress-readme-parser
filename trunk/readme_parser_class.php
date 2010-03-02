@@ -90,9 +90,30 @@ class wp_readme_parser {
 			}
 			if (stristr($line,"Tags:"))
 			{
-				$this->setTags(substr($line,strpos($line,"Tags:")+13));			
+				$this->setTags(substr($line,strpos($line,"Tags:")+5));			
 			}
+			if (stristr($line,"Requires at least:"))
+			{
+				$this->setRequire(substr($line,strpos($line,"Requires at least:")+18));			
+			}
+			if (stristr($line,"==="))
+			{
+				$line = str_replace("=== ","<h1>",$line);
+				$line = str_replace(" ===","</h1>",$line);
+			}
+			if (stristr($line,"=="))
+			{
+				$line = str_replace("== ","<h2>",$line);
+				$line = str_replace(" ==","</h2>",$line);
+			}
+			if (stristr($line,"==="))
+			{
+				$line = str_replace("= ","<h3>",$line);
+				$line = str_replace(" =","</h3>",$line);
+			}
+			
 		}
+//		implode("\n",$line);
 	}
 	function find_stable()
 	{
